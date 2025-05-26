@@ -7,7 +7,6 @@
 #    python app.py
 # 3. Send a POST request with a JSON payload (example with payload1.json):
 #    curl -X POST -H "Content-Type: application/json" -d @example_payloads/payload1.json http://localhost:8888/productionplan
-# 4. Result in file example_payloads/response_{timestamp}_wo_co2.json
 # --------------------------------------
 
 from flask import Flask, request, jsonify

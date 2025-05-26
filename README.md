@@ -32,8 +32,6 @@ This version (`app.py`) does not include the calculation of CO2 emission costs.
     ```
     You can use `payload1.json`, `payload2.json`, `payload3.json`, or `payload4.json` for testing.
 
-    This will generate the file `example_payloads/response_{timestamp}_wo_co2.json`.
-
 ### Run the API Application (Version with CO2 calculation - Challenge)
 
 This version (`app_challenge.py`) includes the calculation of CO2 emission costs.
@@ -49,8 +47,6 @@ This version (`app_challenge.py`) includes the calculation of CO2 emission costs
     curl -X POST -H "Content-Type: application/json" -d @example_payloads/payload1.json http://localhost:8888/productionplan
     ```
     You can use `payload1.json`, `payload2.json`, `payload3.json`, or `payload4.json` for testing.
-
-    This will generate the file `example_payloads/response_{timestamp}_with_co2.json`.
 
 ## How to Launch the Application with Docker
 
