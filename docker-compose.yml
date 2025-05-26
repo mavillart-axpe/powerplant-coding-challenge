@@ -17,6 +17,8 @@ services:
       dockerfile: Dockerfile.app_challenge
     ports:
       - "8889:8888" # Map to a different port to avoid conflicts
+    environment:
+      - CO2_EMISSION_FACTOR=0.3 # Pass the CO2 emission factor
     volumes:
       - .:/app
     restart: always

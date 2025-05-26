@@ -12,6 +12,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY app_challenge.py .
 COPY example_payloads/ example_payloads/
 
+# Set environment variable for CO2 emission factor
+ENV CO2_EMISSION_FACTOR=0.3
+
 # Expose the port on which the Flask application runs
 EXPOSE 8888
 

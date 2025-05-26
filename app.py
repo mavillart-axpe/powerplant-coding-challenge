@@ -24,6 +24,7 @@ def production_plan():
     try:
         # Get JSON data from the request.
         payload = request.get_json()
+        app.logger.info("Received JSON payload.")
         if not payload:
             return jsonify({"error": "Invalid JSON payload"}), 400
 
@@ -32,9 +33,44 @@ def production_plan():
         fuels = payload.get('fuels')
         powerplants = payload.get('powerplants')
 
-        # Validate that required fields are present.
-        if load is None or fuels is None or powerplants is None:
-            return jsonify({"error": "Missing required fields in payload"}), 400
+        # Validate that required fields are present and have correct types.
+        if not isinstance(load, (int, float)):
+            return jsonify({"error": "Field 'load' must be a number"}), 400
+        if not isinstance(fuels, dict):
+            return jsonify({"error": "Field 'fuels' must be an object"}), 400
+        if not isinstance(powerplants, list):
+            return jsonify({"error": "Field 'powerplants' must be a list"}), 400
+        
+        app.logger.info("Input payload validated successfully.")
+        app.logger.info(f"Processing {len(powerplants)} powerplants for load {load}.")
+
+        # Validate fuels data
+        required_fuels = ['gas(euro/MWh)', 'kerosine(euro/MWh)', 'wind(%)']
+        for fuel_key in required_fuels:
+            if fuel_key not in fuels or not isinstance(fuels[fuel_key], (int, float)):
+                return jsonify({"error": f"Fuel '{fuel_key}' is missing or not a number"}), 400
+
+        # Validate powerplants data
+        for i, pp in enumerate(powerplants):
+            if not isinstance(pp, dict):
+                return jsonify({"error": f"Powerplant at index {i} must be an object"}), 400
+            
+            required_pp_fields = ['name', 'type', 'efficiency', 'pmax']
+            for field in required_pp_fields:
+                if field not in pp:
+                    return jsonify({"error": f"Powerplant at index {i} is missing field '{field}'"}), 400
+            
+            if not isinstance(pp['name'], str):
+                return jsonify({"error": f"Powerplant at index {i}, field 'name' must be a string"}), 400
+            if not isinstance(pp['type'], str):
+                return jsonify({"error": f"Powerplant at index {i}, field 'type' must be a string"}), 400
+            if not isinstance(pp['efficiency'], (int, float)):
+                return jsonify({"error": f"Powerplant at index {i}, field 'efficiency' must be a number"}), 400
+            if not isinstance(pp['pmax'], (int, float)):
+                return jsonify({"error": f"Powerplant at index {i}, field 'pmax' must be a number"}), 400
+            
+            if 'pmin' in pp and not isinstance(pp['pmin'], (int, float)):
+                return jsonify({"error": f"Powerplant at index {i}, field 'pmin' must be a number"}), 400
 
         # --- Logic to calculate the production plan ---
 
@@ -157,19 +193,6 @@ def production_plan():
             i += 1 # Move the index one position forward for the next powerplant
 
         # Return the production plan as JSON.
-        
-        # Generate the filename with the current timestamp.
-        timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
-        output_filename = f"example_payloads/response_{timestamp}_wo_co2.json"
-        
-        # Ensure the directory exists.
-        output_dir = os.path.dirname(output_filename)
-        os.makedirs(output_dir, exist_ok=True)
-
-        # Save the result to the JSON file.
-        with open(output_filename, 'w') as f:
-            json.dump(production_plan_result, f, indent=4)
-
         return jsonify(production_plan_result), 200
 
     except Exception as e:
