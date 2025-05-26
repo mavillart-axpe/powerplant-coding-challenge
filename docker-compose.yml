@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  app_no_co2:
+    build:
+      context: .
+      dockerfile: Dockerfile.app
+    ports:
+      - "8888:8888"
+    volumes:
+      - .:/app
+    restart: always
+
+  app_with_co2:
+    build:
+      context: .
+      dockerfile: Dockerfile.app_challenge
+    ports:
+      - "8889:8888" # Map to a different port to avoid conflicts
+    volumes:
+      - .:/app
+    restart: always
